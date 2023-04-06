@@ -1,0 +1,57 @@
+2. Ki a legmagasabb törpe, és hány centiméter?
+SELECT Nev, Magassag FROM torpek WHERE Magassag = (SELECT MAX(Magassag) FROM torpek);
+Megoldás: Forf Sak, 146
+________________________________________________________________
+
+3. Hány törpe dolgozott az elmúlt évben Gir Lodur bányáiban? (Gir Lodur Id: 10)
+SELECT COUNT(*) AS Hany_torpe
+FROM kiholdolgozott
+WHERE TarnakId=10;
+Megoldás: 12
+________________________________________________________________
+
+
+4. A legjövedelmezőbb bányászati termék az arany. Melyik tárnákból termeltek ki aranyat a törpék, és
+mekkora mennyiséget? A válasz legyen aranymennyiség szerint csökkenő sorrendben!
+SELECT Tarnak.Nev, SUM(KiHolDolgozott.KitermeltMennyiseg) AS AranyMennyiseg 
+FROM Kozetek
+INNER JOIN Tarnak ON Kozetek.Id = Tarnak.KozetekId
+INNER JOIN KiHolDolgozott ON Tarnak.Id = KiHolDolgozott.TarnakId
+INNER JOIN Torpek ON KiHolDolgozott.TorpekId = Torpek.Id
+WHERE Kozetek.Nev = 'Arany'
+GROUP BY Tarnak.Nev
+ORDER BY AranyMennyiseg DESC;
+Megoldás: Gir Dorth, 211
+	    Tordirth, 88
+________________________________________________________________
+
+5. A Vasököl klán vezetője, Sarsi Duri úgy döntött, idén tavasszal házasodni kíván. Kiszemeltje a Vasököl
+klán legszorgosabb hölgye, aki a legtöbb kőzetet fejtette a bányákban. Ki ő?
+SELECT Torpek.Nev
+FROM Torpek
+INNER JOIN KiHolDolgozott ON Torpek.Id = KiHolDolgozott.TorpekId
+WHERE Torpek.Klan = 'Vasököl' AND Torpek.Nem = 'N'
+GROUP BY Torpek.Id
+ORDER BY SUM(KiHolDolgozott.KitermeltMennyiseg) DESC
+LIMIT 1;
+Megoldás: Tor Zian
+________________________________________________________________
+
+
+6. Az év közepén új törpe érkezett a Vasököl klánba. Neve: Trad Morf, férfi, 136 cm magas és testsúlya
+69 kg. Vegye fel az adatbázisba!
+INSERT INTO torpek (Id, Nev, Klan, Nem, Suly, Magassag)
+VALUES (31, 'Trad Morf', 'Vasököl', 'F', 69,	136);
+________________________________________________________________
+
+
+7. Trad Morf szorgos törpe, Gir Lodur-ban 43 kg-ot, Moldirth-ban pedig 28 kg kőzetet termelt ki. Vegye fel
+az adatokat a megfelelő táblába! Megoldása több pontot ér, ha az azonosítókat lekérdezések
+segítségével határozza meg.
+SELECT MAX(Id)+1 FROM kiholdolgozott;
+SELECT MAX(Id)+1 FROM Torpek;
+SELECT Id FROM Tarnak WHERE Nev = 'Gir Lodur';
+SELECT Id FROM Tarnak WHERE Nev = 'Moldirth';
+
+INSERT INTO KiHolDolgozott (Id, TorpekId, TarnakId, KitermeltMennyiseg)
+VALUES (63, 31, 10, 43), (64, 31, 8, 28);
